@@ -11,6 +11,7 @@ from flask_restful import Resource, Api, abort, reqparse
 from botify.data import DataLogger, Datum
 from botify.experiment import Experiments, Treatment
 from botify.recommenders.random import Random
+from botify.recommenders.sticky_artist import StickyArtist
 from botify.track import Catalog
 
 root = logging.getLogger()
@@ -22,12 +23,14 @@ api = Api(app)
 
 tracks_redis = Redis(app, config_prefix="REDIS_TRACKS")
 # TODO Seminar 2 step 1: create a redis db for artists' tracks
+artists_redis = Redis(app, config_prefix="REDIS_ARTIST")
 
 
 data_logger = DataLogger(app)
 
 catalog = Catalog(app).load(app.config["TRACKS_CATALOG"])
 catalog.upload_tracks(tracks_redis.connection)
+catalog.upload_artists(artists_redis.connection)
 
 parser = reqparse.RequestParser()
 parser.add_argument("track", type=int, location="json", required=True)
@@ -58,15 +61,11 @@ class NextTrack(Resource):
         args = parser.parse_args()
 
         # TODO Seminar 2 step 4: create and run the A/B experiment
-        treatment = Experiments.AA.assign(user)
+        treatment = Experiments.STICKY_ARTIST.assign(user)
         if treatment == Treatment.T1:
-            # Nothing happens because we are in AA experiment
-            pass
+            recommender = StickyArtist(tracks_redis.connection, artists_redis.connection, catalog)
         else:
-            # Nothing happens because we are in AA experiment
-            pass
-
-        recommender = Random(tracks_redis.connection)
+            recommender = Random(tracks_redis.connection)
 
         recommendation = recommender.recommend_next(user, args.track, args.time)
 
