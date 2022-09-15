@@ -76,6 +76,7 @@ pyspark2 --master=yarn --num-executors=2
 http://localhost:16006/
 ```
 ## Работа на кластере HDFS
+![Архитектура сервиса botify](hdfs.png)
 Закидываем логи контейнера в hdfs (папка script должна быть в $PYTHONPATH). 
 Программа dataclient.py отправляет данные в папку юзера: /user/dnikanorova/
 ```
