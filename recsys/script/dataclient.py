@@ -47,7 +47,7 @@ def upload_logs_to_hdfs(command_args, passwd):
     )
 
     local_tmp_dir = tempfile.mkdtemp()
-    remote_temp_dir = "/tmp/" + str(int(time.time()))
+    remote_temp_dir = "tmp/" + str(int(time.time()))
 
     ssh = None
     try:
