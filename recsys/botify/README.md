@@ -64,6 +64,10 @@ mkdir jupyter
 ```
 scp jupyter/Week1Seminar.ipynb dnikanorova@mipt-client.atp-fivt.org:jupyter
 ```
+Скачиваем файлы с удаленного сервера на локальную машину:
+```
+scp dnikanorova@mipt-client.atp-fivt.org:data/top_tracks.json ../botify/data/top_tracks.json
+```
 Стартуем ноутбук
 ```
 export PYSPARK_DRIVER_PYTHON=jupyter
@@ -81,6 +85,10 @@ http://localhost:16006/
 Программа dataclient.py отправляет данные в папку юзера: /user/dnikanorova/
 ```
 python dataclient.py --user dnikanorova log2hdfs --cleanup my_remote_dir
+```
+Отправляем файлы с сервера в hdfs
+```
+hadoop fs -put my_remote_dir/random_10k.json /user/dnikanorova/my_remote_dir/
 ```
 Проверяем содержимое папки в hdfs
 ```
