@@ -53,6 +53,9 @@ class Experiments:
     A static container for all the existing experiments.
     """
 
+    # TODO Seminar 3 step 4: Configure 4-way TOP_POP A/B experiment.
+    #  Wow! Why should we split our users into 4 groups? Hold on, we will explain an idea in the next step!
+
     AA = Experiment("AA", Split.HALF_HALF)
     STICKY_ARTIST = Experiment("STICKY_ARTIST", Split.HALF_HALF)
 

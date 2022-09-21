@@ -20,14 +20,28 @@ class Catalog:
     def __init__(self, app):
         self.app = app
         self.tracks = []
+        self.top_tracks = []
 
-    def load(self, catalog_path):
+    # TODO Seminar 3 step 1: Implement uploading top tracks to catalog.
+    #  Here we need to add most popular tracks to top_tracks instance attribute.
+    #  Similar to loading tracks, we need to take 3 major steps:
+    #  1 - Add log message when uploading starts
+    #  2 - Add all elements from top_tracks.json to self.top_tracks
+    #      NOTE that top_tracks.json is just an array of integers,
+    #      so we don't need to iterate over it and create instances of Track class!
+    #      So, which method from the json library should we use?..
+    #  3 - Add log message when uploading ends
+
+    def load(self, catalog_path, top_tracks_path=""):
         self.app.logger.info(f"Loading tracks from {catalog_path}")
         with open(catalog_path) as catalog_file:
             for j, line in enumerate(catalog_file):
                 data = json.loads(line)
                 self.tracks.append(Track(data["track"], data["artist"], data["title"],))
         self.app.logger.info(f"Loaded {j+1} tracks")
+
+        # your code here
+
         return self
 
     def upload_tracks(self, redis):
@@ -37,7 +51,6 @@ class Catalog:
         self.app.logger.info(f"Uploaded {len(self.tracks)} tracks")
 
     def upload_artists(self, redis):
-        # TODO Seminar 2 step 2: upload artists tracks to redis
         self.app.logger.info(f"Uploading artists to redis")
         sorted_tracks = sorted(self.tracks, key=lambda t: t.artist)
         for j, (artist, artist_catalog) in enumerate(
