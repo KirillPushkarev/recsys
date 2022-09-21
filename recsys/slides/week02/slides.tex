@@ -1,4 +1,4 @@
-\documentclass[11pt,aspectratio=169]{beamer}
+\documentclass[11pt,aspectratio=169,handout]{beamer}
 
 \usetheme{Singapore}
 \usecolortheme{orchid}
@@ -22,6 +22,19 @@
 \author{Николай Анохин}
 \title{Метрики и базовые подходы}
 
+\logo{\includegraphics[width=.05\textwidth]{images/ok_logo.png}}
+
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
+
 %\setbeamercovered{transparent} 
 %\setbeamertemplate{navigation symbols}{} 
 %\logo{} 
@@ -38,25 +51,7 @@
 \titlepage
 \end{frame}
 
-%\begin{frame}
-%\tableofcontents
-%\end{frame}
-
 }
-
-\begin{frame}{Программа модуля}
-\begin{tabular}{ l | l | c | c }
-{\bf Дата} & {\bf Тема} & {\bf Семинар} & {\bf Домашка} \\
-\hline
-2021-09-30 & Рекомендательные сервисы в продакшене & \checked &  \\
-{\color{info} 2021-10-07} & {\color{info} Метрики и базовые подходы} & {\color{info} \checked} &  \\ 
-2021-09-14 & Классические алгоритмы & \checked & \checked  \\
-2021-09-21 & Нейросетевые рекомендеры & \checked &  \\
-2021-09-28 & Нерешенные проблемы и новые направления & \checked & 
-\end{tabular}
-\end{frame}
-
-\section{Сбор данных}
 
 \begin{frame}{Контекст}
 
@@ -66,42 +61,55 @@
 
 \end{frame}
 
+\section{Оценка успешности идей}
+
 \begin{frame}{Научный метод}
 
 \begin{columns}
-\begin{column}{0.6\textwidth}   
+\begin{column}{0.45\textwidth}   
    \begin{center}
-      \includegraphics[scale=0.45]{images/method.jpeg}
+      \includegraphics[scale=0.35]{images/method.jpeg}
     \end{center}
 \end{column}
-\begin{column}{0.35\textwidth}
+\begin{column}{0.45\textwidth}
     \begin{tcolorbox}[colback=gray!5,colframe=gray!80,title=]
-       Чем быстрее делаем оброт, тем быстрее улучшаем сервис
+       Чем быстрее проходим все этапы, тем быстрее улучшаем сервис
     \end{tcolorbox}
 \end{column}
 \end{columns}
 
+\end{frame}
 
+\begin{frame}{}
+
+\begin{tcolorbox}[colback=gray!5,colframe=gray!80,title=Миссия компании]
+Дать пользователям возможность быть ближе к семье и друзьям
+\end{tcolorbox}
+
+\begin{center}
+\includegraphics[scale=0.14]{images/odnoklassniki.jpeg}
+\end{center}
 
 \end{frame}
 
 \begin{frame}{A/B эксперимент \cite{RSHB}}
 
 \begin{columns}
-\begin{column}{0.45\textwidth}
+\begin{column}{0.47\textwidth}
    \begin{tcolorbox}[colback=info!5,colframe=info!80,title=Плюсы]
       \begin{itemize}
       \item Надежная оценка эффекта на любую метрику
       \end{itemize}
     \end{tcolorbox}
 \end{column}
-\begin{column}{0.45\textwidth}
+\begin{column}{0.47\textwidth}
     \begin{tcolorbox}[colback=warn!5,colframe=warn!80,title=Минусы]
       \begin{itemize}
        \item Риск необратимо расстроить пользователей
        \item Риск финансовых потерь
        \item Дорого заводить
-       \item Ограниченный трафик
+       \item Долго ждать результат
+       \item Метрик не всегда достаточно
       \end{itemize}
     \end{tcolorbox}
 \end{column}
@@ -112,7 +120,7 @@
 \begin{frame}{Опрос пользователей}
 
 \begin{columns}
-\begin{column}{0.45\textwidth}
+\begin{column}{0.47\textwidth}
    \begin{tcolorbox}[colback=info!5,colframe=info!80,title=Плюсы]
       \begin{itemize}
       \item Полный контроль над экспериментом
@@ -121,7 +129,7 @@
       \end{itemize}
     \end{tcolorbox}
 \end{column}
-\begin{column}{0.45\textwidth}
+\begin{column}{0.47\textwidth}
     \begin{tcolorbox}[colback=warn!5,colframe=warn!80,title=Минусы]
       \begin{itemize}
        \item Дорогой сбор данных
@@ -137,18 +145,18 @@
 \begin{frame}{Офлайн эксперимент}
 
 \begin{columns}
-\begin{column}{0.45\textwidth}
+\begin{column}{0.47\textwidth}
    \begin{tcolorbox}[colback=info!5,colframe=info!80,title=Плюсы]
       \begin{itemize}
-      \item Проверка большого числа гипотез
+      \item Большая скорость проверки гипотез
       \item Нельзя сломать прод
       \end{itemize}
     \end{tcolorbox}
 \end{column}
-\begin{column}{0.45\textwidth}
+\begin{column}{0.47\textwidth}
     \begin{tcolorbox}[colback=warn!5,colframe=warn!80,title=Минусы]
       \begin{itemize}
-       \item Нужно подбирать метрики
+       \item Не все метрики доступны офлайн
        \item Смещение выборки
        \item Результат не обязан обобщаться
       \end{itemize}
@@ -158,28 +166,11 @@
 
 \end{frame}
 
-\begin{frame}{}
+\section{Офлайн эксперимент}
 
-\begin{tcolorbox}[colback=info!5,colframe=info!80,title=]
-При офлайн оценке нужно стремиться к тому, чтобы данные были максимально похожи на реальность
-\end{tcolorbox}
+\begin{frame}{Какие бывают метрики}
 
-\vfill
-
-Техники выбора тестовых данных
-\begin{itemize}
-\item Семплировать случайные пары user-item \pause
-\item Семплировать случайные item у каждого пользователя \pause
-\item Семплировать тестовых пользователей \pause
-\item Тестовые данные после обучающих по времени \pause
-\item Написать симулятор системы
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}{}
-\begin{tcolorbox}[colback=gray!5,colframe=gray!80,title=Бизнесовая метрика]
-% деньги, пользователи, retention, ...
+\begin{tcolorbox}[colback=gray!5,colframe=gray!80,title=Бизнесовая]
 напрямую интересует бизнес
 \begin{itemize}
   \item сложно оптимизировать
@@ -188,8 +179,7 @@
  \end{itemize}
 \end{tcolorbox}
 \vfill
-\begin{tcolorbox}[colback=gray!5,colframe=gray!80,title=Техническая метрика]
-% точность, разнообразие, ...
+\begin{tcolorbox}[colback=gray!5,colframe=gray!80,title=Техническая]
 отражает один аспект системы
 \begin{itemize}
   \item можно оптимизировать
@@ -210,9 +200,9 @@
 \end{column}
 \begin{column}{0.4\textwidth}
     \begin{tcolorbox}[colback=gray!5,colframe=gray!80,title=Техническая метрика]
-    \begin{itemize}
-    \item[-] Явный/explicit \pause
-    \item[-] Неявный/implicit \pause
+    \begin{itemize}%[<+->]
+    \item[-] Явный/explicit
+    \item[-] Неявный/implicit
     \item[-] Отложенный/delayed
     \end{itemize}
     \end{tcolorbox}
@@ -220,6 +210,20 @@
 \end{columns}
 
 \end{frame}
+
+\begin{frame}{Как сформировать тестовую выборку}
+
+\begin{itemize} [<+->]
+\item Семплировать случайные пары user-item
+\item Семплировать случайные item у каждого пользователя 
+\item Семплировать тестовых пользователей
+\item Тестовые данные после обучающих по времени
+\item Написать симулятор системы
+\end{itemize}
+
+\end{frame}
+
+\section{Релевантность}
 
 \begin{frame}{Pinkamena Diane Pie}
 
@@ -237,8 +241,6 @@
 \end{columns}
 
 \end{frame}
-
-\section{Релевантность}
 
 \begin{frame}{Релевантность}
 
@@ -389,16 +391,6 @@ RMSE, MAE, accuracy, precision, recall, auc, ...
 
 \end{frame}
 
-\begin{frame}{Гайд по выбору метрик Николая Анохина}
-
-\begin{enumerate}
-\item Находим метрики релевантности, которые подходят к задаче
-\item Выбираем в качестве основной самую интерпретируемую
-\item Усложняем метрику, если оказалось, что она не отражает реальность
-\end{enumerate}
-
-\end{frame}
-
 \section{Покрытие}
 
 \begin{frame}{Item space coverage}
@@ -417,6 +409,8 @@ gini = \frac{1}{| I | - 1} \sum_{j=1}^{| I |}(2 j - | I | - 1) p(I_j)
 $p^1(I_j)$ -- частота, с которой пользователи выбирают айтем $I_j$ 
 
 $p^2(I_j)$ -- частота, с которой рекомендер показывает айтем $I_j$ 
+
+Айтемы отсортированы по возрастанию $p(I_j)$ 
 
 \end{frame}
 
@@ -460,6 +454,13 @@ With 1\% precision loss, percentage of rec. long-tail items increases from 16 to
 Метрика сильно зависит от того, как определить сходство
 \end{tcolorbox}
 
+\end{frame}
+
+\begin{frame}
+Maximal Marginal Relevance \cite{CARBONELL}
+\[
+MMR = \max_j \left[ \lambda \, similarity(j, U) + (1 - \lambda) \max_{k < j} similarity(k, j) \right]
+\]
 \end{frame}
 
 \section{Удачность}
@@ -518,6 +519,16 @@ unexp(u, i) = \max_{j \in I_u} \left( -nPMI(i, j) \right)
 
 \end{frame}
 
+\begin{frame}{Гайд по выбору метрик Николая Анохина}
+
+\begin{enumerate}
+\item Находим релевантности, которые подходят к задаче
+\item Выбираем в качестве основной самую интерпретируемую
+\item Усложняем метрику, если оказалось, что она не отражает реальность
+\end{enumerate}
+
+\end{frame}
+
 \section{Бейзлайны}
 
 \begin{frame}{}
@@ -532,10 +543,11 @@ unexp(u, i) = \max_{j \in I_u} \left( -nPMI(i, j) \right)
 
 \vfill
 
-\begin{itemize}
+\begin{itemize}%[<+->]
 \item Живительный рандом
 \item TopPopular
 \item Эвристики
+\item Редакторская подборка
 \end{itemize}
 
 \end{frame}
@@ -553,9 +565,15 @@ unexp(u, i) = \max_{j \in I_u} \left( -nPMI(i, j) \right)
 \end{tcolorbox}
 
 \begin{tcolorbox}[colback=info!5,colframe=info!80,title=]
-Не обмазываемся сложными алгоритмами, пока не заведем простые бейзлайны
+Don't be a hero: не связываемся со сложными алгоритмами, пока не заведем простые бейзлайны
 \end{tcolorbox}
 
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\includegraphics[scale=0.9]{images/zbazibo.jpeg}
+\end{center}
 \end{frame}
 
 \begin{frame}[allowframebreaks]{Литература}
