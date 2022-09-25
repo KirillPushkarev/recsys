@@ -12,6 +12,7 @@ from botify.data import DataLogger, Datum
 from botify.experiment import Experiments, Treatment
 from botify.recommenders.random import Random
 from botify.recommenders.sticky_artist import StickyArtist
+from botify.recommenders.top_pop import TopPop
 from botify.track import Catalog
 
 root = logging.getLogger()
@@ -30,7 +31,7 @@ data_logger = DataLogger(app)
 # TODO Seminar 3 step 2: Upload top tracks to catalog.
 #  Here we need to call load method. Don't forget to configure path to the top tracks!
 
-catalog = Catalog(app).load(app.config["TRACKS_CATALOG"])
+catalog = Catalog(app).load(app.config["TRACKS_CATALOG"], app.config["TOP_TRACKS_CATALOG"])
 catalog.upload_tracks(tracks_redis.connection)
 catalog.upload_artists(artists_redis.connection)
 
@@ -69,20 +70,15 @@ class NextTrack(Resource):
         #  Should we recommend 10, 100 or 1000 top tracks?
         #  Let's find the answer during randomized four-way AB-test!
 
-        treatment = Experiments.AA.assign(user)
+        treatment = Experiments.TOP_POP.assign(user)
         if treatment == Treatment.T1:
-            # your code here, recommend 10 top tracks
-            pass
+            recommender = TopPop(tracks_redis.connection, catalog.top_tracks[:10])
         elif treatment == Treatment.T2:
-            # your code here, recommend 100 top tracks
-            pass
+            recommender = TopPop(tracks_redis.connection, catalog.top_tracks[:100])
         elif treatment == Treatment.T3:
-            # your code here, recommend 1000 top tracks
-            pass
+            recommender = TopPop(tracks_redis.connection, catalog.top_tracks[:1000])
         else:
-            pass
-
-        recommender = StickyArtist(tracks_redis.connection, artists_redis.connection, catalog)
+            recommender = StickyArtist(tracks_redis.connection, artists_redis.connection, catalog)
 
         recommendation = recommender.recommend_next(user, args.track, args.time)
 

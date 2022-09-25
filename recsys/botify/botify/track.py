@@ -32,7 +32,7 @@ class Catalog:
     #      So, which method from the json library should we use?..
     #  3 - Add log message when uploading ends
 
-    def load(self, catalog_path, top_tracks_path=""):
+    def load(self, catalog_path, top_tracks_path):
         self.app.logger.info(f"Loading tracks from {catalog_path}")
         with open(catalog_path) as catalog_file:
             for j, line in enumerate(catalog_file):
@@ -40,7 +40,10 @@ class Catalog:
                 self.tracks.append(Track(data["track"], data["artist"], data["title"],))
         self.app.logger.info(f"Loaded {j+1} tracks")
 
-        # your code here
+        self.app.logger.info(f"Loading top tracks from {top_tracks_path}")
+        with open(top_tracks_path) as top_tracks_file:
+            self.top_tracks = json.load(top_tracks_file)
+        self.app.logger.info(f"Loaded {len(self.top_tracks)} top tracks")
 
         return self
 
