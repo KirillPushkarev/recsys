@@ -1,4 +1,4 @@
-\documentclass[11pt,aspectratio=169]{beamer}
+\documentclass[11pt,aspectratio=169,handout]{beamer}
 
 \usetheme{Singapore}
 \usecolortheme{orchid}
@@ -22,12 +22,18 @@
 \author{Николай Анохин}
 \title{Классические алгоритмы рекомендаций}
 
-%\setbeamercovered{transparent} 
-%\setbeamertemplate{navigation symbols}{} 
-%\logo{} 
-%\institute{} 
-%\date{} 
-%\subject{} 
+\logo{\includegraphics[width=.05\textwidth]{images/ok_logo.png}}
+
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
 
 \begin{document}
 
@@ -44,18 +50,6 @@
 
 }
 
-\begin{frame}{Программа модуля}
-\begin{tabular}{ l | l | c | c }
-{\bf Дата} & {\bf Тема} & {\bf Семинар} & {\bf Домашка} \\
-\hline
-2021-09-30 & Рекомендательные сервисы в продакшене & \checked &  \\
-2021-10-07 & Метрики и базовые подходы & \checked &  \\ 
-{\color{info} 2021-09-14} & {\color{info} Классические алгоритмы рекомендаций } & {\color{info} \checked} & {\color{info} \checked}  \\
-2021-09-21 & Нейросетевые рекомендеры & \checked &  \\
-2021-09-28 & Нерешенные проблемы и новые направления & \checked & 
-\end{tabular}
-\end{frame}
-
 \begin{frame}{Контекст}
 
 \begin{center}
@@ -65,18 +59,82 @@
 \end{frame}
 
 \begin{frame}
+
+\begin{columns}
+
+\begin{column}{0.47\textwidth} 
+
 \begin{center}
 \includegraphics[scale=0.22]{images/taxonomy.png}
 \end{center}
+
+\end{column}
+
+\begin{column}{0.47\textwidth} 
+
+\begin{center}
+\includegraphics[scale=0.2]{images/karlson.png}
+\end{center}
+
+\end{column}
+
+\end{columns}
+
 \end{frame}
 
 \section{Content-based RS}
 
+\begin{frame}{Пример: интуиция}
+
+\begin{columns}
+
+\begin{column}{0.47\textwidth} 
+
+Нравится:
+\begin{itemize}
+\item Возвращение короля
+\item Король былого и грядущего
+\item Война мага
+\end{itemize}
+
+Не нравится:
+\begin{itemize}
+\item Новый ум короля
+\end{itemize}
+
+Что порекомендуем?
+\begin{itemize}
+\item Битва королей
+\item Война и мир
+\end{itemize}
+
+\end{column}
+
+\begin{column}{0.47\textwidth} 
+
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
 \begin{frame}{Content-based RS}
 
+\begin{columns}
+
+\begin{column}{0.47\textwidth} 
 \begin{tcolorbox}[colback=info!5,colframe=info!80,title=Идея]
 Рекомендуем пользователю айтемы, похожие на те, что нравились ей раньше
 \end{tcolorbox}
+\end{column}
+
+\begin{column}{0.47\textwidth} 
+\begin{center}
+\includegraphics[scale=0.15]{images/content-idea.png}
+\end{center}
+\end{column}
+
+\end{columns}
 
 \end{frame}
 
@@ -94,10 +152,10 @@
 \begin{tabular}{ l | p{20em} }
 {\bf Данные} & {\bf Признаки} \\
 \hline
-Любые & Категориальные / числовые \\
-Текст & BOW / TF-IDF / BM25 / Эмбеддинги \\
-Картинки & SIFT/SURF/Эмбеддинги \\
-Музыка &  Spectral 
+Табличные \pause &  Категориальные / числовые \\
+Текст \pause & BOW / TF-IDF / BM25 / NN Эмбеддинги \\
+Картинки \pause & SIFT / SURF / NN Эмбеддинги \\
+Музыка \pause & Spectral 
 \end{tabular}
 \end{center}
 
@@ -143,8 +201,7 @@ recommendations = \arg_i topk \, p(u \, likes \, i)
   Примеры моделей:
   \begin{itemize}
   \item Naive Bayes
-  \item Rocchio
-  \item Meta-learning
+  \item Любой классификатор
   \end{itemize}
     
 \end{column}
@@ -168,27 +225,75 @@ recommendations = \arg_i topk \, p(u \, likes \, i)
 
 \end{frame}
 
-\begin{frame}{На Spark}
+\begin{frame}{Пример: формально}
 
-Tokenizer
+\begin{columns}
 
-\url{https://spark.apache.org/docs/latest/ml-features.html\#tokenizer}
+\begin{column}{0.47\textwidth} 
 
-\vfill
+Нравится:
+\begin{itemize}
+\item Возвращение короля
+\item Король былого и грядущего
+\item Война мага
+\end{itemize}
 
-TF-IDF
+Не нравится:
+\begin{itemize}
+\item Новый ум короля
+\end{itemize}
 
-\url{https://spark.apache.org/docs/latest/ml-features\#tf-idf}
+Что порекомендуем?
+\begin{enumerate}
+\item Битва королей
+\item Война и мир
+\end{enumerate}
 
-\vfill
+\end{column}
 
-Word2Vec
+\begin{column}{0.47\textwidth}
+\begin{footnotesize}
+Naive Bayes
+\[
+p(c | d) \sim p(c) p(d | c) = 
+\]
+\[
+= p(c) \prod_j p(w_j | c) \sim \log p(c) + \sum_j \log p(w_j | c)
+\]
+\[
+p(w_j | c) = \frac{N_{jc} + \alpha}{N_c + \alpha |V|}
+\]
+% возвращение король былое грядущее война маг новый ум битва мир
+Размер словаря $|V| = 10$, $\alpha = 1$ \\
+Вероятности классов $p(+) = 3/4$, $p(-) = 1/4$
+Скоры документов
+\[
+p(+|1) \sim \log 3/4 + \log 1 / 13 + \log 3 / 13
+\]
+\[
+p(-|1) \sim \log 1/4 + \log 1 / 11 + \log 2 / 11
+\]
+\[
+s(1) = p^*(+|1)  - p^*(-|1) = 2.69
+\]
+% s(2) = 2.10
+\end{footnotesize}
+\end{column}
 
-\url{https://spark.apache.org/docs/latest/ml-features\#word2vec}
+\end{columns}
 
 \end{frame}
 
-\begin{frame}{}
+\begin{frame}{Известные использования}
+
+\begin{itemize}
+\item Spotify: Deep content-based music recommendation \cite{SPOTIFY}
+\item Ozon: Векторное представление товаров Prod2Vec: как мы улучшили матчинг и избавились от кучи эмбеддингов \cite{OZON}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Итоги}
 
 \begin{tcolorbox}[colback=info!5,colframe=info!80,title=Плюсы]
   \begin{itemize}
@@ -198,35 +303,19 @@ Word2Vec
   \end{itemize}
 \end{tcolorbox}
 
-\end{frame}
-
-\begin{frame}{}
-
 \begin{tcolorbox}[colback=warn!5,colframe=warn!80,title=Минусы]
   \begin{itemize}
     \item Полагаются на (несовершенные) техники анализа контента
-    \item Отсутствие новизны: умеют рекомендовать только похожие айтемы
     \item Нет поддержки холодного старта пользователей
+        \item Отсутствие новизны: умеют рекомендовать только похожие айтемы
   \end{itemize}
 \end{tcolorbox}
 
 \end{frame}
 
-\section{Collaborative filtering-based RS}
+\section{Neighbourhood-based Collaborative Filtering}
 
-\begin{frame}{Collaborative filtering\footnote{Оскар за худшее название алгоритма}-based RS}
-
-\begin{tcolorbox}[colback=info!5,colframe=info!80,title=Идея]
-Рекомендуем пользователю айтемы, которые понравились похожим на нее пользователям.
-\end{tcolorbox}
-
-\end{frame}
-
-\begin{frame}{Neighbourhood CF \cite{MMDS}}
-
-\begin{tcolorbox}[colback=info!5,colframe=info!80,title=Идея]
-Пользователи похожи, если они похоже оценивают одни и те же айтемы
-\end{tcolorbox}
+\begin{frame}{Пример: интуиция \cite{MMDS}}
 
 \begin{center}
 \includegraphics[scale=0.5]{images/utility.png}
@@ -234,19 +323,39 @@ Word2Vec
 
 \end{frame}
 
+\begin{frame}{Collaborative filtering\footnote{Оскар за худшее название алгоритма}-based RS}
+
+\begin{columns}
+
+\begin{column}{0.47\textwidth} 
+\begin{tcolorbox}[colback=info!5,colframe=info!80,title=Идея]
+Рекомендуем пользователю айтемы, которые понравились похожим на нее пользователям. Пользователи похожи, если они похоже оценивают одни и те же айтемы.
+\end{tcolorbox}
+\end{column}
+
+\begin{column}{0.47\textwidth} 
+\begin{center}
+\includegraphics[scale=0.1]{images/cf-idea.png}
+\end{center}
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
 \begin{frame}
 
 \begin{columns}
 \begin{column}{0.45\textwidth}   
-\quad\; User-based ($|U| < |I|$)
+\quad\; User-based
    \[
    \hat r_{ui} = h^{-1} \left( \frac{\sum_{v \in N_i(u)} w_{uv} h(r_{vi})}{\sum_{v \in N_i(u)} w_{uv}} \right)
    \]
 \end{column}
 \begin{column}{0.45\textwidth}
-\quad\; Item-based ($|U| > |I|$)
+\quad\; Item-based
   \[
-  \hat r_{ui} = h^{-1} \left( \frac{\sum_{j \in N_u(i)} w_{ij} h(r_{uj})}{\sum_{v \in N_u(i)} w_{uj}} \right)
+  \hat r_{ui} = h^{-1} \left( \frac{\sum_{j \in N_u(i)} w_{ij} h(r_{uj})}{\sum_{j \in N_u(i)} w_{ij}} \right)
   \]
 \end{column}
 \end{columns}
@@ -260,12 +369,6 @@ Word2Vec
 \item $h$ -- функция нормализации
 \end{itemize}
 
-\vfill
-
-\begin{tcolorbox}[colback=gray!5,colframe=gray!80,title=]
-Небольшое количество надежных соседей лучше, чем много ненадежных
-\end{tcolorbox}
-
 \end{frame}
 
 \begin{frame}
@@ -277,6 +380,31 @@ cos(u, v) = \frac{\sum_{i \in I_{uv}} r_{ui} r_{vi}}{\sqrt{\sum_{i \in I_u} r_{u
 \[
 pearson(u, v) = \frac{\sum_{i \in I_{uv}} (r_{ui} - \bar r_u) (r_{vi} - \bar r_v)}{\sqrt{\sum_{i \in I_{uv}} (r_{ui} - \bar r_u)^2 \sum_{i \in I_{uv}} (r_{vi}^2 - \bar r_v)}}
 \]
+
+\end{frame}
+
+\begin{frame}
+
+{\bf Дано:} \\
+100 айтемов \\
+1000 пользователей \\
+10000 рейтингов равномерно распределены по пользователям и айтемам \\
+
+\vfill
+
+{\bf Вопрос:} \\
+Сколько в среднем общих айтемов у пары пользователей? \\
+Сколько в среднем общих пользователей у пары айтемов? \\
+
+\vfill
+
+\begin{tcolorbox}[colback=gray!5,colframe=gray!80,title=]
+Небольшое количество надежных соседей лучше, чем много ненадежных
+\begin{itemize}
+\item User-based ($|U| < |I|$)
+\item Item-based  ($|U| > |I|$)
+\end{itemize}
+\end{tcolorbox}
 
 \end{frame}
 
@@ -306,31 +434,55 @@ MinHash for Jaccard Distance
 
 \end{frame}
 
+\begin{frame}{Пример: формально}
+
+\begin{center}
+\includegraphics[scale=0.5]{images/utility.png}
+\end{center}
+
+Нормализация: $h(r) = r$
+Веса
+\[
+cos(A, B) = \frac{4 \dot 5}{ \sqrt{42} \sqrt{66} } = 0.37
+\]
+% 0.18
+\[
+cos(B, C) = \, ? 
+\]
+% 4.0, 2.0
+\[
+r(TW) = \, ? \quad r(SW1) = \, ?
+\]
+
+\end{frame}
+
 \begin{frame}{}
-% Графовый рекомендер групп
 
 \begin{tcolorbox}[colback=info!5,colframe=info!80,title=Плюсы]
   \begin{itemize}
-    \item Простота и интуитивность
-    \item Небольшое количество параметров (1)
-    \item Рекомендации можно объяснить
+    \item Простота и интуитивность: рекомендации можно объяснить.
+    \item Небольшое количество параметров
     \item Не нужно обучать, удобно добавлять новых пользователей и айтемы
   \end{itemize}
 \end{tcolorbox}
 
-\end{frame}
-
-\begin{frame}{}
-
 \begin{tcolorbox}[colback=warn!5,colframe=warn!80,title=Минусы]
   \begin{itemize}
-    \item Разреженность пространства
     \item User-based: очень много пользователей для поиска NN
     \item Item-based: как понять, для каких айтемов считать рейтинги?
+    \item Разреженность пространства
   \end{itemize}
 \end{tcolorbox}
 
 \end{frame}
+
+\begin{frame}
+\begin{center}
+\includegraphics[scale=0.8]{images/bye.jpeg}
+\end{center}
+\end{frame}
+
+\section{Model-based Collaborative Filtering}
 
 \begin{frame}{Model-based CF}
 
@@ -339,12 +491,12 @@ MinHash for Jaccard Distance
 \end{tcolorbox}
 
 \begin{center}
-\includegraphics[scale=0.5]{images/utility.png}
+\includegraphics[scale=0.5]{images/utility-2.png}
 \end{center}
 
 \end{frame}
 
-\begin{frame}{Бейзлайн}
+\begin{frame}{Бейзлайн \cite{KOREN}}
 
 \begin{columns}
 \begin{column}{0.2\textwidth} 
@@ -409,6 +561,12 @@ b_{ui} = \mu + b_u + b_i
 
 \end{frame}
 
+\begin{frame}
+\begin{center}
+\includegraphics[scale=0.3]{images/latent.png}
+\end{center}
+\end{frame}
+
 \begin{frame}{Как оптимизировать}
 \[
 \sum_{u, i} (r_{ui} - \mu - b_u - b_i - q_i^T p_u)^2 + \lambda (b_u^2 +  b_i^2 + \| q_i \|^2 + \| p_u \|^2)
@@ -464,6 +622,18 @@ b_{ui} = \mu + b_u + b_i
 \begin{itemize}
 \item $t_{ui}$ -- время, когда пользователь оценил айтем
 \end{itemize}
+
+\end{frame}
+
+\begin{frame}{Netflix Prize }
+
+\begin{center}
+\includegraphics[scale=0.25]{images/svd-compare.png}
+\end{center}
+
+\begin{small}
+September 21, 2009, the grand prize of US\$1,000,000 was given to the BellKor's Pragmatic Chaos team which bested Netflix's own algorithm for predicting ratings by 10.06
+\end{small}
 
 \end{frame}
 
@@ -533,37 +703,41 @@ q_i = \sum_{j \in f_i} v_j, \quad p_u = \sum_{j \in f_u} w_j
 
 \end{frame}
 
-\begin{frame}{На Spark}
+\begin{frame}{Реализации}
 
-ALS
-
-\url{https://spark.apache.org/docs/2.2.0/ml-collaborative-filtering.html}
-
-\vfill
-
-RSVD
-
-\url{https://github.com/criteo/Spark-RSVD}
+\begin{center}
+\begin{tabular}{l c c c}
+ & Spark & LightFM & Implicit \\
+\hline
+\hline
+SGD & & \checked & \\
+ALS & \checked & & \checked \\
+\hline
+RMSE & \checked &  & \checked \\
+logistic & & \checked & \checked \\
+BPR & & \checked & \checked \\
+WARP & & \checked & \\
+\hline
+GPU & & & \checked \\
+\end{tabular}
+\end{center}
 
 \end{frame}
 
 \begin{frame}{}
-% Графовый рекомендер групп
 
 \begin{tcolorbox}[colback=info!5,colframe=info!80,title=Плюсы]
   \begin{itemize}
-    \item Качество рекомендаций
+    \item Качество рекомендаций: новизна как у neighbourhood-based CF, но можно заполнить все пробелы в user-item матрице
+    \item Большой выбор моделей и лоссов
+    \item Можно переформулировать как нейронную сеть
   \end{itemize}
 \end{tcolorbox}
-
-\end{frame}
-
-\begin{frame}{}
 
 \begin{tcolorbox}[colback=warn!5,colframe=warn!80,title=Минусы]
   \begin{itemize}
     \item Сложные алгоримы оптимизации
-    \item Проблемы с холодным стартом
+    \item Холодный старт как пользователей, так и айтемов нужно отдельно решать
   \end{itemize}
 \end{tcolorbox}
 
@@ -590,14 +764,32 @@ RSVD
 \begin{frame}
 
 \begin{tcolorbox}[colback=info!5,colframe=info!80,title=]
-Существуют ситуации, в которых могут пригодиться как CB, так и CF подходы
+Реальные рекомендеры почти всегда hybrid: применяются как CF, так и CB подходы
 \end{tcolorbox}
-
-\vfill
 
 \begin{tcolorbox}[colback=info!5,colframe=info!80,title=]
-Некоторые из них даже реализованы на спарке
+``Дефолтным'' алгоритмом рекомендаций считается матричная факторизация
 \end{tcolorbox}
+
+\end{frame}
+
+\begin{frame}{В следующий раз}
+
+\begin{columns}
+
+\begin{column}{0.47\textwidth} 
+\begin{center}
+\includegraphics[scale=0.3]{images/relationships.png}
+\end{center}
+\end{column}
+
+\begin{column}{0.47\textwidth}
+\begin{center}
+\includegraphics[scale=0.15]{images/conspiracy.jpeg}
+\end{center}
+\end{column}
+
+\end{columns}
 
 \end{frame}
 
