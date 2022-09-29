@@ -22,16 +22,6 @@ class Catalog:
         self.tracks = []
         self.top_tracks = []
 
-    # TODO Seminar 3 step 1: Implement uploading top tracks to catalog.
-    #  Here we need to add most popular tracks to top_tracks instance attribute.
-    #  Similar to loading tracks, we need to take 3 major steps:
-    #  1 - Add log message when uploading starts
-    #  2 - Add all elements from top_tracks.json to self.top_tracks
-    #      NOTE that top_tracks.json is just an array of integers,
-    #      so we don't need to iterate over it and create instances of Track class!
-    #      So, which method from the json library should we use?..
-    #  3 - Add log message when uploading ends
-
     def load(self, catalog_path, top_tracks_path):
         self.app.logger.info(f"Loading tracks from {catalog_path}")
         with open(catalog_path) as catalog_file:

@@ -22,14 +22,12 @@ app = Flask(__name__)
 app.config.from_file("config.json", load=json.load)
 api = Api(app)
 
+# TODO Seminar 3 step 1: Create Redis DB and implement uploading recommendations
 tracks_redis = Redis(app, config_prefix="REDIS_TRACKS")
 artists_redis = Redis(app, config_prefix="REDIS_ARTIST")
 
 
 data_logger = DataLogger(app)
-
-# TODO Seminar 3 step 2: Upload top tracks to catalog.
-#  Here we need to call load method. Don't forget to configure path to the top tracks!
 
 catalog = Catalog(app).load(app.config["TRACKS_CATALOG"], app.config["TOP_TRACKS_CATALOG"])
 catalog.upload_tracks(tracks_redis.connection)
@@ -63,22 +61,14 @@ class NextTrack(Resource):
 
         args = parser.parse_args()
 
-        # TODO Seminar 3 step 5: Wire 4-way TOP_POP A/B experiment.
-        #  Recommender systems should provide exploration,
-        #  otherwise they may encapsulate users in their current interests.
-        #  Which level of exploration will be enough for TopPop recommender?
-        #  Should we recommend 10, 100 or 1000 top tracks?
-        #  Let's find the answer during randomized four-way AB-test!
-
+        # TODO Seminar 3 step 4: Wire USER_BASED A/B experiment
         treatment = Experiments.TOP_POP.assign(user)
         if treatment == Treatment.T1:
-            recommender = TopPop(tracks_redis.connection, catalog.top_tracks[:10])
-        elif treatment == Treatment.T2:
-            recommender = TopPop(tracks_redis.connection, catalog.top_tracks[:100])
-        elif treatment == Treatment.T3:
-            recommender = TopPop(tracks_redis.connection, catalog.top_tracks[:1000])
+            pass
         else:
-            recommender = StickyArtist(tracks_redis.connection, artists_redis.connection, catalog)
+            pass
+
+        recommender = Random(tracks_redis.connection)
 
         recommendation = recommender.recommend_next(user, args.track, args.time)
 
