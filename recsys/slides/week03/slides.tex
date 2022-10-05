@@ -724,6 +724,21 @@ GPU & & & \checked \\
 
 \end{frame}
 
+\begin{frame}{Простые автоэнкодеры}
+
+SLIM \cite{SLIM} / EASE \cite{EASE}
+\[
+\hat A = A W,
+\]
+где
+\begin{itemize}
+\item $A$ -- матрица интеракций
+\item $\hat A$ -- предсказанные интеракции
+\item $W_{:,j}$ -- колонка весов агрегации для  $j$ айтема ($W_{ij} \geq 0$ (SLIM), $W_{jj} = 0$).
+\end{itemize}
+
+\end{frame}
+
 \begin{frame}{}
 
 \begin{tcolorbox}[colback=info!5,colframe=info!80,title=Плюсы]
@@ -779,7 +794,7 @@ GPU & & & \checked \\
 
 \begin{column}{0.47\textwidth} 
 \begin{center}
-\includegraphics[scale=0.3]{images/relationships.png}
+\includegraphics[scale=0.18]{images/relationships.png}
 \end{center}
 \end{column}
 
