@@ -1,5 +1,4 @@
 # Botify
-
 Сервис рекомендаций реализован как приложение на [Flask](https://flask-restful.readthedocs.io/en/latest/).
 Это приложение умеет обрабатывать запросы по REST API.
 В качестве in-memory кэша используется [Redis](https://redis.io/).
@@ -50,7 +49,7 @@ docker cp recommender-container:/app/log/ /tmp/
 ## Работа на удаленном сервере
 Заходим на сервер по ssh, прокидываем порт
 ```
-ssh -L 16006:127.0.0.1:30006 dnikanorova@mipt-client.atp-fivt.org
+ssh -L 16006:127.0.0.1:30007 dnikanorova@mipt-client.atp-fivt.org
 ```
 Посмотреть, какие порты заняты
 ```
@@ -72,13 +71,35 @@ scp dnikanorova@mipt-client.atp-fivt.org:data/top_tracks.json ../botify/data/top
 ```
 export PYSPARK_DRIVER_PYTHON=jupyter
 export PYSPARK_PYTHON=/usr/bin/python3
-export PYSPARK_DRIVER_PYTHON_OPTS='notebook --ip="*" --port=30006 --no-browser'
+export PYSPARK_DRIVER_PYTHON_OPTS='notebook --ip="*" --port=30007 --no-browser'
 pyspark2 --master=yarn --num-executors=2
 ```
 Открываем ноутбук на локальном хосте
 ```
 http://localhost:16006/
 ```
+
+## Создание окружения на удаленном сервере
+Создаем окружение на сервере (используйте именно virtualenv)
+```
+virtualenv -p /usr/bin/python3.6 envs/atp-mobod_2022
+```
+Активируем окружение
+```
+source envs/atp-mobod_2022/bin/activate
+```
+Устанавливаем зависимости
+```
+cp /home/dnikanorova/envs/requirements.txt <your_dir>
+pip install -r requirements.txt
+```
+Добавляем созданный кернел для jupyter ноутбука 
+```
+python -m ipykernel install --user --name=atp-mobod_2022
+```
+После этого запускаем jupyter notebook как обычно, выбираем новый kernel:
+Kernel > Change kernel > atp-mobod_2022
+
 ## Работа на кластере HDFS
 ![Архитектура сервиса botify](hdfs.png)
 Закидываем логи контейнера в hdfs (папка script должна быть в $PYTHONPATH). 

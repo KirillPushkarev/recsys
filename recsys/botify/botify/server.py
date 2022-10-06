@@ -13,6 +13,7 @@ from botify.experiment import Experiments, Treatment
 from botify.recommenders.random import Random
 from botify.recommenders.sticky_artist import StickyArtist
 from botify.recommenders.top_pop import TopPop
+from botify.recommenders.user_based import UserBased
 from botify.track import Catalog
 
 root = logging.getLogger()
@@ -25,6 +26,7 @@ api = Api(app)
 # TODO Seminar 3 step 1: Create Redis DB and implement uploading recommendations
 tracks_redis = Redis(app, config_prefix="REDIS_TRACKS")
 artists_redis = Redis(app, config_prefix="REDIS_ARTIST")
+recommendations_redis = Redis(app, config_prefix="REDIS_RECOMMENDATIONS")
 
 
 data_logger = DataLogger(app)
@@ -32,6 +34,7 @@ data_logger = DataLogger(app)
 catalog = Catalog(app).load(app.config["TRACKS_CATALOG"], app.config["TOP_TRACKS_CATALOG"])
 catalog.upload_tracks(tracks_redis.connection)
 catalog.upload_artists(artists_redis.connection)
+catalog.upload_recommendations(recommendations_redis.connection)
 
 parser = reqparse.RequestParser()
 parser.add_argument("track", type=int, location="json", required=True)
@@ -62,13 +65,11 @@ class NextTrack(Resource):
         args = parser.parse_args()
 
         # TODO Seminar 3 step 4: Wire USER_BASED A/B experiment
-        treatment = Experiments.TOP_POP.assign(user)
+        treatment = Experiments.USER_BASED.assign(user)
         if treatment == Treatment.T1:
-            pass
+            recommender = UserBased(recommendations_redis.connection, tracks_redis.connection, catalog)
         else:
-            pass
-
-        recommender = Random(tracks_redis.connection)
+            recommender = Random(tracks_redis.connection)
 
         recommendation = recommender.recommend_next(user, args.track, args.time)
 
