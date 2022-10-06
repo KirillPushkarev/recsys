@@ -13,7 +13,7 @@ from botify.experiment import Experiments, Treatment
 from botify.recommenders.random import Random
 from botify.recommenders.sticky_artist import StickyArtist
 from botify.recommenders.top_pop import TopPop
-from botify.recommenders.user_based import UserBased
+from botify.recommenders.user_based import Collaborative
 from botify.track import Catalog
 
 root = logging.getLogger()
@@ -23,10 +23,11 @@ app = Flask(__name__)
 app.config.from_file("config.json", load=json.load)
 api = Api(app)
 
-# TODO Seminar 3 step 1: Create Redis DB and implement uploading recommendations
+# TODO Seminar 4 step 1: Create Redis DB for SVD recommendations and upload them
 tracks_redis = Redis(app, config_prefix="REDIS_TRACKS")
 artists_redis = Redis(app, config_prefix="REDIS_ARTIST")
 recommendations_redis = Redis(app, config_prefix="REDIS_RECOMMENDATIONS")
+# your code here
 
 
 data_logger = DataLogger(app)
@@ -35,6 +36,7 @@ catalog = Catalog(app).load(app.config["TRACKS_CATALOG"], app.config["TOP_TRACKS
 catalog.upload_tracks(tracks_redis.connection)
 catalog.upload_artists(artists_redis.connection)
 catalog.upload_recommendations(recommendations_redis.connection)
+# your code here
 
 parser = reqparse.RequestParser()
 parser.add_argument("track", type=int, location="json", required=True)
@@ -64,10 +66,10 @@ class NextTrack(Resource):
 
         args = parser.parse_args()
 
-        # TODO Seminar 3 step 4: Wire USER_BASED A/B experiment
+        # TODO Seminar 4 step 3: Wire SVD A/B experiment
         treatment = Experiments.USER_BASED.assign(user)
         if treatment == Treatment.T1:
-            recommender = UserBased(recommendations_redis.connection, tracks_redis.connection, catalog)
+            recommender = Collaborative(recommendations_redis.connection, tracks_redis.connection, catalog)
         else:
             recommender = Random(tracks_redis.connection)
 

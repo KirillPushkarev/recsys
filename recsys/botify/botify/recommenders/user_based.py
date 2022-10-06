@@ -3,8 +3,7 @@ from .random import Random
 from .recommender import Recommender
 
 
-# TODO Seminar 3 step 2: Implement UserBased recommender
-class UserBased(Recommender):
+class Collaborative(Recommender):
     def __init__(self, recommendations_redis, track_redis, catalog):
         self.recommendations_redis = recommendations_redis
         self.fallback = Random(track_redis)

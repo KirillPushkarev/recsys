@@ -53,7 +53,7 @@ class Experiments:
     A static container for all the existing experiments.
     """
 
-    # TODO Seminar 3 step 3: Wire USER_BASED A/B experiment
+    # TODO Seminar 4 step 2: Wire SVD A/B experiment
 
     AA = Experiment("AA", Split.HALF_HALF)
     STICKY_ARTIST = Experiment("STICKY_ARTIST", Split.HALF_HALF)
