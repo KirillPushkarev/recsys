@@ -11,8 +11,6 @@ from flask_restful import Resource, Api, abort, reqparse
 from botify.data import DataLogger, Datum
 from botify.experiment import Experiments, Treatment
 from botify.recommenders.random import Random
-from botify.recommenders.sticky_artist import StickyArtist
-from botify.recommenders.top_pop import TopPop
 from botify.recommenders.user_based import Collaborative
 from botify.track import Catalog
 
@@ -27,7 +25,7 @@ api = Api(app)
 tracks_redis = Redis(app, config_prefix="REDIS_TRACKS")
 artists_redis = Redis(app, config_prefix="REDIS_ARTIST")
 recommendations_redis = Redis(app, config_prefix="REDIS_RECOMMENDATIONS")
-# your code here
+recommendations_svd_redis = Redis(app, config_prefix="REDIS_RECOMMENDATIONS_SVD")
 
 
 data_logger = DataLogger(app)
@@ -35,8 +33,8 @@ data_logger = DataLogger(app)
 catalog = Catalog(app).load(app.config["TRACKS_CATALOG"], app.config["TOP_TRACKS_CATALOG"])
 catalog.upload_tracks(tracks_redis.connection)
 catalog.upload_artists(artists_redis.connection)
-catalog.upload_recommendations(recommendations_redis.connection)
-# your code here
+catalog.upload_recommendations(recommendations_redis.connection, "RECOMMENDATIONS_FILE_PATH")
+catalog.upload_recommendations(recommendations_svd_redis.connection, "RECOMMENDATIONS_SVD_FILE_PATH")
 
 parser = reqparse.RequestParser()
 parser.add_argument("track", type=int, location="json", required=True)
@@ -69,7 +67,7 @@ class NextTrack(Resource):
         # TODO Seminar 4 step 3: Wire SVD A/B experiment
         treatment = Experiments.USER_BASED.assign(user)
         if treatment == Treatment.T1:
-            recommender = Collaborative(recommendations_redis.connection, tracks_redis.connection, catalog)
+            recommender = Collaborative(recommendations_svd_redis.connection, tracks_redis.connection, catalog)
         else:
             recommender = Random(tracks_redis.connection)
 

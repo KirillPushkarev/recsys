@@ -53,9 +53,9 @@ class Catalog:
             redis.set(artist, self.to_bytes(artist_tracks))
         self.app.logger.info(f"Uploaded {j+1} artists")
 
-    def upload_recommendations(self, redis):
+    def upload_recommendations(self, redis, recommendations_path="RECOMMENDATIONS_FILE_PATH"):
         self.app.logger.info(f"Uploading recommendations to redis")
-        recommendations_file_path = self.app.config["RECOMMENDATIONS_FILE_PATH"]
+        recommendations_file_path = self.app.config[recommendations_path]
         with open(recommendations_file_path) as recommendations_file:
             for j, line in enumerate(recommendations_file):
                 recommendations = json.loads(line)

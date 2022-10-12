@@ -100,6 +100,15 @@ python -m ipykernel install --user --name=atp-mobod_2022
 После этого запускаем jupyter notebook как обычно, выбираем новый kernel:
 Kernel > Change kernel > atp-mobod_2022
 
+## Запускаем Tensor Board
+Заходим на кластер, прокидывая порт 6006 (tensorboard по умолчанию открывается именно на нем)
+```
+ssh -L 16007:127.0.0.1:6006  dnikanorova@mipt-client.atp-fivt.org
+```
+Запускаем tensorboard, указывая директорию с логами в параметре --logdir
+```
+tensorboard --logdir data/tb
+```
 ## Работа на кластере HDFS
 ![Архитектура сервиса botify](hdfs.png)
 Закидываем логи контейнера в hdfs (папка script должна быть в $PYTHONPATH). 
