@@ -1,4 +1,4 @@
-\documentclass[11pt,aspectratio=169]{beamer}
+\documentclass[11pt,aspectratio=169,handout]{beamer}
 
 \usetheme{Singapore}
 \usecolortheme{orchid}
@@ -22,12 +22,18 @@
 \author{Николай Анохин}
 \title{Нейросетевые рекомендеры}
 
-%\setbeamercovered{transparent} 
-%\setbeamertemplate{navigation symbols}{} 
-%\logo{} 
-%\institute{} 
-%\date{} 
-%\subject{} 
+\logo{\includegraphics[width=.05\textwidth]{images/ok_logo.png}}
+
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
 
 \begin{document}
 
@@ -43,18 +49,6 @@
 %\end{frame}
 
 }
-
-\begin{frame}{Программа модуля}
-\begin{tabular}{ l | l | c | c }
-{\bf Дата} & {\bf Тема} & {\bf Семинар} & {\bf Домашка} \\
-\hline
-2021-09-30 & Рекомендательные сервисы в продакшене & \checked &  \\
-2021-10-07 & Метрики и базовые подходы & \checked &  \\ 
-2021-09-14 & Классические алгоритмы рекомендаций & \checked & \checked  \\
-{\color{info} 2021-09-21} & {\color{info} Нейросетевые рекомендеры} & {\color{info} \checked} &  \\
-2021-09-28 & Нерешенные проблемы и новые направления & \checked & 
-\end{tabular}
-\end{frame}
 
 \begin{frame}{Контекст}
 
@@ -83,6 +77,11 @@
 Отбор кандидатов & MF & NN \\
 Ранжирование & GBM & NN
 \end{tabular}
+
+\begin{center}
+\includegraphics[scale=0.5]{images/layers.png}
+\end{center}
+
 \end{small}
 
 \end{column}
@@ -92,51 +91,37 @@
 
 \begin{frame}
 
-\begin{tcolorbox}[colback=info!5,colframe=info!80,title=SVD++]
+\begin{columns}
+\begin{column}{0.47\textwidth}
+\begin{center}
+\includegraphics[scale=0.25]{images/svdpp.png}
+\end{center}
+\end{column}
+\begin{column}{0.47\textwidth}
+\begin{small}
 \[
 \hat r_{ui} = \mu + b_u + b_i + q_i^T \left( p_u + \frac{1}{\sqrt{|N(u)|}} \sum_j y_j \right)
 \]
-\end{tcolorbox}
+\end{small}
+\end{column}
+\end{columns}
 
 \end{frame}
 
 \begin{frame}
 
+\begin{columns}
+\begin{column}{0.47\textwidth} 
 \begin{center}
-\includegraphics[scale=0.3]{images/svdpp.png}
+\includegraphics[scale=0.25]{images/svdpp.png}
 \end{center}
-
-\end{frame}
-
-\begin{frame}
-
+\end{column}
+\begin{column}{0.47\textwidth}
 \begin{center}
-\includegraphics[scale=0.3]{images/svdpp-bias.png}
+\includegraphics[scale=0.25]{images/nn.png}
 \end{center}
-
-\end{frame}
-
-\begin{frame}
-
-\begin{center}
-\includegraphics[scale=0.3]{images/svdpp-res.png}
-\end{center}
-
-\end{frame}
-
-\begin{frame}
-
-\begin{center}
-\includegraphics[scale=0.3]{images/svdpp-features.png}
-\end{center}
-
-\end{frame}
-
-\begin{frame}
-
-\begin{center}
-\includegraphics[scale=0.3]{images/svdpp-export.png}
-\end{center}
+\end{column}
+\end{columns}
 
 \end{frame}
 
@@ -144,17 +129,17 @@
 
 \begin{frame}{Истории успеха: отбор кандидатов}
 
-ML = модель + критерий оптимизации + алгоритм оптимизации + данные
+ML = модель + лосс + алгоритм оптимизации + данные
 
 \vfill
 
 \begin{tcolorbox}[colback=info!5,colframe=info!80,title=Как оставить след в науке]
 \pause
-\begin{itemize}
-\item Изобрести или прикрутить хитрый лосс \pause
-\item Изобрести новый метод семплирования данных \pause
-\item Заменить скалярное произведение чем-нибудь покруче \pause
+\begin{itemize}[<+->]
+\item Заменить скалярное произведение чем-нибудь покруче
 \item Заменить эмбединги чем-нибудь покруче
+\item Изобрести или прикрутить хитрый лосс
+\item Изобрести новый метод семплирования данных
 \end{itemize}
 \end{tcolorbox}
 
@@ -239,15 +224,6 @@ ML = модель + критерий оптимизации + алгоритм �
 Интересность & $\star\star\star$ \\
 Полезность & $\star$
 \end{tabular}
-
-\end{frame}
-
-\begin{frame}{Библиотеки приближенного поиска соседей}
-\url{https://github.com/erikbern/ann-benchmarks}
-
-\begin{center}
-\includegraphics[scale=0.3]{images/ann.png}
-\end{center}
 
 \end{frame}
 
@@ -346,7 +322,7 @@ ML = модель + критерий оптимизации + алгоритм �
 
 \begin{tabular}{l l}
 Интересность & $\star\star\star\star\star$ \\
-Полезность & $\star\star$
+Полезность & $\star\star\star\star$
 \end{tabular}
 
 \end{frame}
@@ -389,7 +365,7 @@ ML = модель + критерий оптимизации + алгоритм �
 
 \end{frame}
 
-\section{Итоги}
+\section{Проблемы нейрорекомендеров}
 
 \begin{frame}{Проблема воспроизводимости \cite{PROGRESS}}
 
@@ -428,6 +404,8 @@ The CMN method was presented at SIGIR 18 and combines memory networks and neural
 
 \end{frame}
 
+\section{Итоги}
+
 \begin{frame}{Итоги}
 
 \begin{tcolorbox}[colback=info!5,colframe=info!80,title=]
@@ -442,6 +420,12 @@ The CMN method was presented at SIGIR 18 and combines memory networks and neural
 Нейросетевой подход не гарантирует выигрыша -- к выбору модели нужно подходить прагматично.
 \end{tcolorbox}
 
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\includegraphics[scale=1.0]{images/bye.jpeg}
+\end{center}
 \end{frame}
 
 \begin{frame}[allowframebreaks]{Литература}
