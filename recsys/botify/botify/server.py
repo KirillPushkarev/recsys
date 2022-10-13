@@ -63,7 +63,7 @@ class NextTrack(Resource):
 
         args = parser.parse_args()
 
-        # TODO Seminar 5 step 3: Wire CONTEXTUAL A/B experiment
+        # TODO Seminar 5 step 4: Wire CONTEXTUAL A/B experiment
         treatment = Experiments.USER_BASED.assign(user)
         if treatment == Treatment.T1:
             recommender = Collaborative(recommendations_svd_redis.connection, tracks_redis.connection, catalog)
