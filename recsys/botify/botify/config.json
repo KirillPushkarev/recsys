@@ -11,7 +11,7 @@
   "REDIS_RECOMMENDATIONS_SVD_HOST": "redis",
   "REDIS_RECOMMENDATIONS_SVD_PORT": 6379,
   "REDIS_RECOMMENDATIONS_SVD_DB": 3,
-  "TRACKS_CATALOG": "./data/tracks.json",
+  "TRACKS_CATALOG": "./data/tracks_with_recs.json",
   "TOP_TRACKS_CATALOG": "./data/top_tracks.json",
   "RECOMMENDATIONS_FILE_PATH": "./data/recommendations.json",
   "RECOMMENDATIONS_SVD_FILE_PATH": "./data/recommendations_SVD.json",

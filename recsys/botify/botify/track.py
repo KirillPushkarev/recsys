@@ -1,7 +1,8 @@
 import itertools
 import json
 import pickle
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import List
 
 
 @dataclass
@@ -9,6 +10,7 @@ class Track:
     track: int
     artist: str
     title: str
+    recommendations: List[int] = field(default=lambda: [])
 
 
 class Catalog:
@@ -22,6 +24,7 @@ class Catalog:
         self.tracks = []
         self.top_tracks = []
 
+    # TODO Seminar 5 step 1: Configure uploading recommendations
     def load(self, catalog_path, top_tracks_path):
         self.app.logger.info(f"Loading tracks from {catalog_path}")
         with open(catalog_path) as catalog_file:

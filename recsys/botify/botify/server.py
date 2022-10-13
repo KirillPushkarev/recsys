@@ -21,7 +21,6 @@ app = Flask(__name__)
 app.config.from_file("config.json", load=json.load)
 api = Api(app)
 
-# TODO Seminar 4 step 1: Create Redis DB for SVD recommendations and upload them
 tracks_redis = Redis(app, config_prefix="REDIS_TRACKS")
 artists_redis = Redis(app, config_prefix="REDIS_ARTIST")
 recommendations_redis = Redis(app, config_prefix="REDIS_RECOMMENDATIONS")
@@ -64,7 +63,7 @@ class NextTrack(Resource):
 
         args = parser.parse_args()
 
-        # TODO Seminar 4 step 3: Wire SVD A/B experiment
+        # TODO Seminar 5 step 3: Wire CONTEXTUAL A/B experiment
         treatment = Experiments.USER_BASED.assign(user)
         if treatment == Treatment.T1:
             recommender = Collaborative(recommendations_svd_redis.connection, tracks_redis.connection, catalog)
