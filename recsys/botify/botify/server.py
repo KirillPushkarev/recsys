@@ -10,6 +10,7 @@ from flask_restful import Resource, Api, abort, reqparse
 
 from botify.data import DataLogger, Datum
 from botify.experiment import Experiments, Treatment
+from botify.recommenders.contextual import Contextual
 from botify.recommenders.random import Random
 from botify.recommenders.user_based import Collaborative
 from botify.track import Catalog
@@ -64,9 +65,9 @@ class NextTrack(Resource):
         args = parser.parse_args()
 
         # TODO Seminar 5 step 4: Wire CONTEXTUAL A/B experiment
-        treatment = Experiments.USER_BASED.assign(user)
+        treatment = Experiments.CONTEXTUAL.assign(user)
         if treatment == Treatment.T1:
-            recommender = Collaborative(recommendations_svd_redis.connection, tracks_redis.connection, catalog)
+            recommender = Contextual(tracks_redis.connection, catalog)
         else:
             recommender = Random(tracks_redis.connection)
 

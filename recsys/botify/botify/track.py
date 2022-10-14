@@ -30,7 +30,7 @@ class Catalog:
         with open(catalog_path) as catalog_file:
             for j, line in enumerate(catalog_file):
                 data = json.loads(line)
-                self.tracks.append(Track(data["track"], data["artist"], data["title"],))
+                self.tracks.append(Track(data["track"], data["artist"], data["title"], data["recommendations"],))
         self.app.logger.info(f"Loaded {j+1} tracks")
 
         self.app.logger.info(f"Loading top tracks from {top_tracks_path}")
