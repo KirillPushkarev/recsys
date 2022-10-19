@@ -1,4 +1,4 @@
-\documentclass[11pt,aspectratio=169]{beamer}
+\documentclass[11pt,aspectratio=169,handout]{beamer}
 
 \usetheme{Singapore}
 \usecolortheme{orchid}
@@ -22,12 +22,18 @@
 \author{Николай Анохин}
 \title{Нерешенные проблемы и новые направления}
 
-%\setbeamercovered{transparent} 
-%\setbeamertemplate{navigation symbols}{} 
-%\logo{} 
-%\institute{} 
-%\date{} 
-%\subject{} 
+\logo{\includegraphics[width=.05\textwidth]{images/ok_logo.png}}
+
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
 
 \begin{document}
 
@@ -44,18 +50,6 @@
 
 }
 
-\begin{frame}{Программа модуля}
-\begin{tabular}{ l | l | c | c }
-{\bf Дата} & {\bf Тема} & {\bf Семинар} & {\bf Домашка} \\
-\hline
-2021-09-30 & Рекомендательные сервисы в продакшене & \checked &  \\
-2021-10-07 & Метрики и базовые подходы & \checked &  \\ 
-2021-09-14 & Классические алгоритмы рекомендаций & \checked & \checked  \\
-2021-09-21 & Нейросетевые рекомендеры & \checked &  \\
-{\color{info} 2021-09-28} & {\color{info} Нерешенные проблемы и новые направления} & {\color{info} \checked} & 
-\end{tabular}
-\end{frame}
-
 \begin{frame}{Контекст}
 
 \begin{center}
@@ -66,11 +60,34 @@
 
 \begin{frame}{Что мы уже умеем}
 
-\begin{huge}
+\begin{columns}
+\begin{column}{0.55\textwidth}
+\begin{center}
+\begin{tcolorbox}[colback=info!5,colframe=info!80,title=]
+\begin{large}
 \[
 \hat r_{ui} = f_{\theta}(x_u, x_i, x_c)
 \]
-\end{huge}
+\end{large}
+\end{tcolorbox}\end{center}
+\end{column}
+
+\begin{column}{0.35\textwidth} 
+\begin{center}
+\includegraphics[scale=0.4]{images/simple.jpeg}
+\end{center}
+\end{column}
+\end{columns}
+
+\vfill
+
+Проблемы
+\begin{enumerate}[<+->]
+\item Оцениваем айтемы по-отдельности, а показываем по несколько (лентой)
+\item Модель не объясняет, почему именно эти айтемы подходят пользователю
+\item Смещение между распределениями на обучении и применении
+\item {\color{blue} Не учитывается долгострочный эффект рекомендаций}
+\end{enumerate}
 
 \end{frame}
 
@@ -182,11 +199,11 @@ Managing Diversity in Airbnb Search \cite{AIRBNB}
 \begin{frame}{}
 
 \begin{tcolorbox}[colback=info!5,colframe=info!80,title=]
-Пост-процессим предсказания модели, чтобы получить разнообразные рекомендации
+Из-за поточечного предсказания релевантности, приходится дополнительно разнообразить списки рекомендаций
 \end{tcolorbox}
 
 \begin{tcolorbox}[colback=info!5,colframe=info!80,title=]
-Необходимость разнообразия можно обосновываем A/B тестом.
+Необходимость разнообразия обосновывается A/B экспериментом
 \end{tcolorbox}
 
 \end{frame}
@@ -210,15 +227,16 @@ Managing Diversity in Airbnb Search \cite{AIRBNB}
 \end{frame}
 
 \begin{frame}{Зачем объяснять рекомендации?}
-\begin{itemize} \pause
-\item Прозрачность: объяснить пользователю, как работает система \pause
-\item Контролируемость: позволить пользователю исправить ошибки \pause
-\item Доверие: убедить пользователя, что система работает правильно \pause
-\item Убеждение: мотивировать пользователя к покупке \pause
-\item Полезность: помочь пользователю принять правильное решение \pause
-\item Эффективность: помочь пользователю принять решение быстро \pause
-\item Удовольствие: сделать приятно пользователю
-\end{itemize}
+
+\begin{enumerate}[<+->]
+\item Прозрачность: объяснить пользователю, как работает система
+\item Контролируемость: позволить пользователю исправить ошибки
+\item Доверие: убедить пользователя, что система работает правильно
+\item Убеждение: мотивировать пользователя к покупке
+\item Полезность: помочь пользователю принять правильное решение
+\item Эффективность: помочь пользователю принять решение быстро
+\end{enumerate}
+
 \end{frame}
 
 \begin{frame}
@@ -252,7 +270,7 @@ Customers Who Bought This Item Also Bought A
 \begin{frame}
 
 \begin{tcolorbox}[colback=info!5,colframe=info!80,title=Content-based]
-Recommended because you said you owned Book A
+Recommended because you said liked science fiction
 \end{tcolorbox}
 
 \vfill
@@ -316,9 +334,9 @@ r(j, e, x) = \sigma(\theta_{global} + \theta_{j} \times 1_j + \theta_e \times 1_
 
 \end{frame}
 
-\section{Causal Recommenders}
+\section{Смещения}
 
-\begin{frame}{Causal Recommenders}
+\begin{frame}{Удачные рекомендации}
 
 \begin{center}
 \includegraphics[scale=0.22]{images/serendipity-pony.png}
@@ -326,13 +344,58 @@ r(j, e, x) = \sigma(\theta_{global} + \theta_{j} \times 1_j + \theta_e \times 1_
 
 \end{frame}
 
-\begin{frame}
+\begin{frame}{Пример self-selection bias}
+
+\begin{center}
+\includegraphics[scale=0.3]{images/bias-example.png}
+\end{center}
+
+\[
+R(\hat Y) = \frac{1}{U I} \sum_u \sum_i \delta_{ui} (Y, \hat Y), \quad R_{naive}(\hat Y) = \frac{1}{N} \sum_{(u,i) \in D} \delta_{ui}(Y, \hat Y)
+\]
+
+\end{frame}
+
+\begin{frame}{Смещения в рекомендациях \cite{BIAS}}
+
+\begin{center}
+\includegraphics[scale=0.2]{images/bias.png}
+\end{center}
+
+\end{frame}
+
+\begin{frame}{Inverse Propensity Scored Estimator \cite{TREATMENTS}}
+
+$P_{ui} = P((u, i) \in D)$ -- вероятность, что пользователь $u$ поставит оценку айтему $i$
+
+\[
+R_{IPS}(\hat Y | P) = \frac{1}{U I} \sum_{(u,i) \in D} \frac{\delta_{ui}(Y, \hat Y)}{P_{ui}}
+\]
+
+\[
+E_D [R_{IPS}(\hat Y | P)] = \frac{1}{U I} \sum_u \sum_i E_D\left[ \frac{\delta_{ui}(Y, \hat Y)}{P_{ui}} \mathbb{I}\{(u, i) \in D\}\right] = 
+\]
+\[
+= \frac{1}{U I} \sum_u \sum_i \delta_{ui} (Y, \hat Y) = R(\hat Y) 
+\]
+
+\end{frame}
+
+\begin{frame}{IPS Estimator: проблемы}
+
+\begin{enumerate}
+\item Когда $P_{ui}$ неизвестно, его приходится оценивать
+\item Большая дисперсия при оценке $P_{ui}$
+\item Непонятно, как быть с рекомендациями списков
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}{Causal рекомендации}
 
 \begin{tcolorbox}[colback=warn!5,colframe=warn!80,title=Традиционный рекомендер]
 Посмотрит ли пользователь этот фильм, если известно что она смотрела в прошлом?
 \end{tcolorbox}
-
-\vfill
 
 \begin{tcolorbox}[colback=info!5,colframe=info!80,title=Causal рекомендер]
 Посмотрит ли пользователь этот фильм, если мы его порекомендуем, и известно, что она смотрела в прошлом?
@@ -364,8 +427,12 @@ r(j, e, x) = \sigma(\theta_{global} + \theta_{j} \times 1_j + \theta_e \times 1_
 \end{column}
 \end{columns}
 
-\begin{center}
+\end{frame}
 
+\begin{frame}
+
+\begin{center}
+\includegraphics[scale=0.6]{images/deconf-result.png}
 \end{center}
 
 \end{frame}
@@ -373,88 +440,10 @@ r(j, e, x) = \sigma(\theta_{global} + \theta_{j} \times 1_j + \theta_e \times 1_
 \begin{frame}
 
 \begin{tcolorbox}[colback=info!5,colframe=info!80,title=]
-Прежде чем делать causal рекомендации, думаем как поставить эксперимент, измеряющий causal effect.
+Из-за специфики сбора данных рекомендации подвержены смещениям. 
 \end{tcolorbox}
-
-\end{frame}
-
-\section{RL в рекомендациях}
-
-\begin{frame}{Долгосрочный эффект}
-
-\begin{center}
-\includegraphics[scale=0.22]{images/longterm.png}
-\end{center}
-
-\end{frame}
-
-\begin{frame}{Почему Reinforcement Learning?}
-
 \begin{tcolorbox}[colback=info!5,colframe=info!80,title=]
-\begin{enumerate}
-\item Feedback loop: рекомендер влияет на пользователя
-\item Замыкание в пузыре и дилемма explore/exploit
-\item Отложенная награда и долгосрочный эффект
-\item Смещение между обучающими и продакшен данными
-\end{enumerate}
-\end{tcolorbox}
-
-\vfill
-
-\begin{center}
-\includegraphics[scale=0.2]{images/rl.png}
-\end{center}
-
-\end{frame}
-
-\begin{frame}{Где тогда Reinforcement Learning?}
-
-\begin{tcolorbox}[colback=warn!5,colframe=warn!80,title=]
-\begin{itemize}
-\item Огромное количество действий
-\item Отсутствие сред для проверки идей
-\item Дорогая реализация алгоритмов
-\end{itemize}
-\end{tcolorbox}
-
-\end{frame}
-
-\begin{frame}{Deep Reinforcement Learning in Large Discrete Action Spaces \cite{DDPG}}
-
-\begin{columns}
-\begin{column}{0.4\textwidth}
-\begin{center}
-\includegraphics[scale=0.25]{images/ddpg.png}
-\end{center}
-\end{column}
-
-\begin{column}{0.5\textwidth}
-\begin{center}
-\includegraphics[scale=0.25]{images/ddpg-result.png}
-\end{center}
-\end{column}
-\end{columns}
-
-\end{frame}
-
-\begin{frame}{RecSim: A Configurable Simulation Platform for Recommender Systems \cite{RECSIM}}
-
-\begin{center}
-\includegraphics[scale=0.2]{images/recsim.png}
-\end{center}
-
-\end{frame}
-
-\begin{frame}
-
-\begin{tcolorbox}[colback=warn!5,colframe=warn!80,title=]
-Придется подождать, пока RL в рекомендациях станет общей практикой.
-\end{tcolorbox}
-
-\vfill
-
-\begin{tcolorbox}[colback=info!5,colframe=info!80,title=]
-Пока что привыкаем к вероятностным политикам и логируем вероятности.
+Существуют техники для корректировки, но они несовершенны.
 \end{tcolorbox}
 
 \end{frame}
@@ -464,31 +453,15 @@ r(j, e, x) = \sigma(\theta_{global} + \theta_{j} \times 1_j + \theta_e \times 1_
 \begin{frame}{Итоги}
 
 \begin{tcolorbox}[colback=info!5,colframe=info!80,title=]
-В будущем рекомендательные системы будут давать релевантные, разнообразные и полезные рекомендации. Они будут учитывать долгосрочные интересы пользователей. А пользователи будут понимать, почему им что-то предлагают и смогут котролировать механизмы построения рекомендаций.
-\end{tcolorbox}
-
-\begin{tcolorbox}[colback=info!5,colframe=info!80,title=]
-Но понадобится ваша помощь.
+При построении моделей мы делаем упрощающие предположения. Из-за этих предположений в продакшен системах могут возникать негативные эффекты. Эти эффекты нужно учитывать и пытаться исправить.
 \end{tcolorbox}
 
 \end{frame}
 
 \begin{frame}
-
 \begin{center}
-\includegraphics[scale=0.5]{images/poll.png}
+\includegraphics[scale=0.55]{images/bye.jpeg}
 \end{center}
-
-\end{frame}
-
-\begin{frame}
-
-\begin{center}
-\includegraphics[scale=0.4]{images/thankyou.jpeg}
-
-Не прощаюсь: дедлайн домашки 10 ноября 23:59 МСК
-\end{center}
-
 \end{frame}
 
 \begin{frame}[allowframebreaks]{Литература}
