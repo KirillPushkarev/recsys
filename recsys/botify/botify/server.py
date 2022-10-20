@@ -26,16 +26,17 @@ api = Api(app)
 
 # TODO Seminar 6 step 3: Create redis DB with tracks with diverse recommendations
 tracks_redis = Redis(app, config_prefix="REDIS_TRACKS")
+tracks_with_diverse_recs_redis = Redis(app, config_prefix="REDIS_TRACKS_WITH_DIVERSE_RECS")
 artists_redis = Redis(app, config_prefix="REDIS_ARTIST")
 recommendations_redis = Redis(app, config_prefix="REDIS_RECOMMENDATIONS")
 recommendations_svd_redis = Redis(app, config_prefix="REDIS_RECOMMENDATIONS_SVD")
 
-
 data_logger = DataLogger(app)
 
 # TODO Seminar 6 step 4: Upload tracks with diverse recommendations to redis DB
-catalog = Catalog(app).load(app.config["TRACKS_CATALOG"], app.config["TOP_TRACKS_CATALOG"])
-catalog.upload_tracks(tracks_redis.connection)
+catalog = Catalog(app).load(app.config["TRACKS_CATALOG"], app.config["TOP_TRACKS_CATALOG"],
+                            app.config["TRACKS_WITH_DIVERSE_RECS_CATALOG"])
+catalog.upload_tracks(tracks_redis.connection, tracks_with_diverse_recs_redis.connection)
 catalog.upload_artists(artists_redis.connection)
 catalog.upload_recommendations(recommendations_redis.connection, "RECOMMENDATIONS_FILE_PATH")
 catalog.upload_recommendations(recommendations_svd_redis.connection, "RECOMMENDATIONS_SVD_FILE_PATH")
@@ -69,9 +70,19 @@ class NextTrack(Resource):
         args = parser.parse_args()
 
         # TODO Seminar 6 step 6: Wire RECOMMENDERS A/B experiment
-        treatment = Experiments.CONTEXTUAL.assign(user)
+        treatment = Experiments.RECOMMENDERS.assign(user)
         if treatment == Treatment.T1:
+            recommender = StickyArtist(tracks_redis.connection, artists_redis.connection, catalog)
+        elif treatment == Treatment.T2:
+            recommender = TopPop(tracks_redis.connection, catalog.top_tracks[:100])
+        elif treatment == Treatment.T3:
+            recommender = Collaborative(recommendations_redis.connection, tracks_redis.connection, catalog)
+        elif treatment == Treatment.T4:
+            recommender = Collaborative(recommendations_svd_redis.connection, tracks_redis.connection, catalog)
+        elif treatment == Treatment.T5:
             recommender = Contextual(tracks_redis.connection, catalog)
+        elif treatment == Treatment.T6:
+            recommender = Contextual(tracks_with_diverse_recs_redis.connection, catalog)
         else:
             recommender = Random(tracks_redis.connection)
 
