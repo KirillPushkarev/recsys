@@ -23,15 +23,20 @@ class Catalog:
         self.app = app
         self.tracks = []
         self.top_tracks = []
+        self.tracks_with_diverse_recs = []
 
-    # TODO Seminar 5 step 1: Configure uploading recommendations
-    def load(self, catalog_path, top_tracks_path):
+    # TODO Seminar 6 step 1: Configure reading tracks with diverse recommendations
+    def load(self, catalog_path, top_tracks_path, tracks_with_diverse_recs_path):
         self.app.logger.info(f"Loading tracks from {catalog_path}")
         with open(catalog_path) as catalog_file:
             for j, line in enumerate(catalog_file):
                 data = json.loads(line)
-                self.tracks.append(Track(data["track"], data["artist"], data["title"], data["recommendations"],))
-        self.app.logger.info(f"Loaded {j+1} tracks")
+                self.tracks.append(Track(data["track"], data["artist"], data["title"], data["recommendations"], ))
+        self.app.logger.info(f"Loaded {j + 1} tracks")
+
+        self.app.logger.info(f"Loading tracks with diverse recommendations from {tracks_with_diverse_recs_path}")
+        # your code is here
+        self.app.logger.info(f"Loaded {j + 1} tracks with diverse recs")
 
         self.app.logger.info(f"Loading top tracks from {top_tracks_path}")
         with open(top_tracks_path) as top_tracks_file:
@@ -40,21 +45,27 @@ class Catalog:
 
         return self
 
-    def upload_tracks(self, redis):
+    # TODO Seminar 6 step 2: Configure uploading tracks with diverse recommendations to redis DB
+    def upload_tracks(self, redis_tracks, redis_tracks_with_diverse_recs):
         self.app.logger.info(f"Uploading tracks to redis")
         for track in self.tracks:
-            redis.set(track.track, self.to_bytes(track))
-        self.app.logger.info(f"Uploaded {len(self.tracks)} tracks")
+            redis_tracks.set(track.track, self.to_bytes(track))
+
+        # your code is here
+
+        self.app.logger.info(
+            f"Uploaded {len(self.tracks)} tracks, {len(self.tracks_with_diverse_recs)} tracks with diverse recs"
+        )
 
     def upload_artists(self, redis):
         self.app.logger.info(f"Uploading artists to redis")
         sorted_tracks = sorted(self.tracks, key=lambda t: t.artist)
         for j, (artist, artist_catalog) in enumerate(
-            itertools.groupby(sorted_tracks, key=lambda t: t.artist)
+                itertools.groupby(sorted_tracks, key=lambda t: t.artist)
         ):
             artist_tracks = [t.track for t in artist_catalog]
             redis.set(artist, self.to_bytes(artist_tracks))
-        self.app.logger.info(f"Uploaded {j+1} artists")
+        self.app.logger.info(f"Uploaded {j + 1} artists")
 
     def upload_recommendations(self, redis, recommendations_path="RECOMMENDATIONS_FILE_PATH"):
         self.app.logger.info(f"Uploading recommendations to redis")

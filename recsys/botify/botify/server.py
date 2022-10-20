@@ -12,6 +12,8 @@ from botify.data import DataLogger, Datum
 from botify.experiment import Experiments, Treatment
 from botify.recommenders.contextual import Contextual
 from botify.recommenders.random import Random
+from botify.recommenders.sticky_artist import StickyArtist
+from botify.recommenders.top_pop import TopPop
 from botify.recommenders.user_based import Collaborative
 from botify.track import Catalog
 
@@ -22,6 +24,7 @@ app = Flask(__name__)
 app.config.from_file("config.json", load=json.load)
 api = Api(app)
 
+# TODO Seminar 6 step 3: Create redis DB with tracks with diverse recommendations
 tracks_redis = Redis(app, config_prefix="REDIS_TRACKS")
 artists_redis = Redis(app, config_prefix="REDIS_ARTIST")
 recommendations_redis = Redis(app, config_prefix="REDIS_RECOMMENDATIONS")
@@ -30,6 +33,7 @@ recommendations_svd_redis = Redis(app, config_prefix="REDIS_RECOMMENDATIONS_SVD"
 
 data_logger = DataLogger(app)
 
+# TODO Seminar 6 step 4: Upload tracks with diverse recommendations to redis DB
 catalog = Catalog(app).load(app.config["TRACKS_CATALOG"], app.config["TOP_TRACKS_CATALOG"])
 catalog.upload_tracks(tracks_redis.connection)
 catalog.upload_artists(artists_redis.connection)
@@ -64,7 +68,7 @@ class NextTrack(Resource):
 
         args = parser.parse_args()
 
-        # TODO Seminar 5 step 4: Wire CONTEXTUAL A/B experiment
+        # TODO Seminar 6 step 6: Wire RECOMMENDERS A/B experiment
         treatment = Experiments.CONTEXTUAL.assign(user)
         if treatment == Treatment.T1:
             recommender = Contextual(tracks_redis.connection, catalog)
@@ -108,7 +112,6 @@ api.add_resource(Hello, "/")
 api.add_resource(Track, "/track/<int:track>")
 api.add_resource(NextTrack, "/next/<int:user>")
 api.add_resource(LastTrack, "/last/<int:user>")
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=7777)

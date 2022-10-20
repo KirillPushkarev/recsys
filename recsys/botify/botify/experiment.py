@@ -9,12 +9,16 @@ class Treatment(Enum):
     T2 = 2
     T3 = 3
     T4 = 4
+    T5 = 5
+    T6 = 6
 
 
 class Split(Enum):
     HALF_HALF = 2
     FOUR_WAY = 4
     FIVE_WAY = 5
+    SIX_WAY = 6
+    SEVEN_WAY = 7
 
 
 class Experiment:
@@ -53,7 +57,7 @@ class Experiments:
     A static container for all the existing experiments.
     """
 
-    # TODO Seminar 5 step 3: Create CONTEXTUAL A/B experiment
+    # TODO Seminar 6 step 5: Create RECOMMENDERS A/B experiment
 
     AA = Experiment("AA", Split.HALF_HALF)
     STICKY_ARTIST = Experiment("STICKY_ARTIST", Split.HALF_HALF)
