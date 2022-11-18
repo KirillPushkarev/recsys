@@ -3,47 +3,18 @@ import logging
 import time
 from dataclasses import asdict
 from datetime import datetime
+from typing import Union
 
 from flask import Flask
 from flask_redis import Redis
 from flask_restful import Resource, Api, abort, reqparse
+from flask_restful.reqparse import RequestParser
+from redis.client import StrictRedis
 
+from botify.catalog import Catalog
 from botify.data import DataLogger, Datum
-from botify.experiment import Experiments, Treatment
 from botify.recommenders.contextual import Contextual
-from botify.recommenders.random import Random
-from botify.recommenders.sticky_artist import StickyArtist
-from botify.recommenders.top_pop import TopPop
-from botify.recommenders.user_based import Collaborative
-from botify.track import Catalog
-
-root = logging.getLogger()
-root.setLevel("INFO")
-
-app = Flask(__name__)
-app.config.from_file("config.json", load=json.load)
-api = Api(app)
-
-# TODO Seminar 6 step 3: Create redis DB with tracks with diverse recommendations
-tracks_redis = Redis(app, config_prefix="REDIS_TRACKS")
-tracks_with_diverse_recs_redis = Redis(app, config_prefix="REDIS_TRACKS_WITH_DIVERSE_RECS")
-artists_redis = Redis(app, config_prefix="REDIS_ARTIST")
-recommendations_redis = Redis(app, config_prefix="REDIS_RECOMMENDATIONS")
-recommendations_svd_redis = Redis(app, config_prefix="REDIS_RECOMMENDATIONS_SVD")
-
-data_logger = DataLogger(app)
-
-# TODO Seminar 6 step 4: Upload tracks with diverse recommendations to redis DB
-catalog = Catalog(app).load(app.config["TRACKS_CATALOG"], app.config["TOP_TRACKS_CATALOG"],
-                            app.config["TRACKS_WITH_DIVERSE_RECS_CATALOG"])
-catalog.upload_tracks(tracks_redis.connection, tracks_with_diverse_recs_redis.connection)
-catalog.upload_artists(artists_redis.connection)
-catalog.upload_recommendations(recommendations_redis.connection, "RECOMMENDATIONS_FILE_PATH")
-catalog.upload_recommendations(recommendations_svd_redis.connection, "RECOMMENDATIONS_SVD_FILE_PATH")
-
-parser = reqparse.RequestParser()
-parser.add_argument("track", type=int, location="json", required=True)
-parser.add_argument("time", type=float, location="json", required=True)
+from botify.utils import from_bytes
 
 
 class Hello(Resource):
@@ -55,40 +26,32 @@ class Hello(Resource):
 
 
 class Track(Resource):
+    def __init__(self, tracks_with_recs_redis: Union[Redis, StrictRedis]):
+        self.tracks_redis = tracks_with_recs_redis
+
     def get(self, track: int):
-        data = tracks_redis.connection.get(track)
+        data = self.tracks_redis.connection.get(track)
         if data is not None:
-            return asdict(catalog.from_bytes(data))
+            return asdict(from_bytes(data))
         else:
             abort(404, description="Track not found")
 
 
 class NextTrack(Resource):
+    def __init__(self, parser: RequestParser, tracks_with_recs_redis: Union[Redis, StrictRedis], data_logger: DataLogger):
+        self.parser = parser
+        self.tracks_redis = tracks_with_recs_redis
+        self.data_logger = data_logger
+
     def post(self, user: int):
         start = time.time()
 
-        args = parser.parse_args()
-
-        # TODO Seminar 6 step 6: Wire RECOMMENDERS A/B experiment
-        treatment = Experiments.RECOMMENDERS.assign(user)
-        if treatment == Treatment.T1:
-            recommender = StickyArtist(tracks_redis.connection, artists_redis.connection, catalog)
-        elif treatment == Treatment.T2:
-            recommender = TopPop(tracks_redis.connection, catalog.top_tracks[:100])
-        elif treatment == Treatment.T3:
-            recommender = Collaborative(recommendations_redis.connection, tracks_redis.connection, catalog)
-        elif treatment == Treatment.T4:
-            recommender = Collaborative(recommendations_svd_redis.connection, tracks_redis.connection, catalog)
-        elif treatment == Treatment.T5:
-            recommender = Contextual(tracks_redis.connection, catalog)
-        elif treatment == Treatment.T6:
-            recommender = Contextual(tracks_with_diverse_recs_redis.connection, catalog)
-        else:
-            recommender = Random(tracks_redis.connection)
+        args = self.parser.parse_args()
+        recommender = Contextual(self.tracks_redis.connection)
 
         recommendation = recommender.recommend_next(user, args.track, args.time)
 
-        data_logger.log(
+        self.data_logger.log(
             "next",
             Datum(
                 int(datetime.now().timestamp() * 1000),
@@ -103,10 +66,14 @@ class NextTrack(Resource):
 
 
 class LastTrack(Resource):
+    def __init__(self, parser: RequestParser, data_logger: DataLogger):
+        self.parser = parser
+        self.data_logger = data_logger
+
     def post(self, user: int):
         start = time.time()
-        args = parser.parse_args()
-        data_logger.log(
+        args = self.parser.parse_args()
+        self.data_logger.log(
             "last",
             Datum(
                 int(datetime.now().timestamp() * 1000),
@@ -119,10 +86,40 @@ class LastTrack(Resource):
         return {"user": user}
 
 
-api.add_resource(Hello, "/")
-api.add_resource(Track, "/track/<int:track>")
-api.add_resource(NextTrack, "/next/<int:user>")
-api.add_resource(LastTrack, "/last/<int:user>")
-
 if __name__ == "__main__":
+    root = logging.getLogger()
+    root.setLevel("INFO")
+
+    app = Flask(__name__)
+    app.config.from_file("config.json", load=json.load)
+
+    data_logger = DataLogger(app)
+
+    parser = reqparse.RequestParser()
+    parser.add_argument("track", type=int, location="json", required=True)
+    parser.add_argument("time", type=float, location="json", required=True)
+
+    tracks_with_recs_redis = Redis(app, config_prefix="REDIS_TRACKS_WITH_RECS")
+    tracks_with_diverse_recs_redis = Redis(app, config_prefix="REDIS_TRACKS_WITH_DIVERSE_RECS")
+    artists_redis = Redis(app, config_prefix="REDIS_ARTIST")
+    recommendations_redis = Redis(app, config_prefix="REDIS_RECOMMENDATIONS")
+    recommendations_svd_redis = Redis(app, config_prefix="REDIS_RECOMMENDATIONS_SVD")
+
+    catalog = Catalog(app)
+    catalog.load_data_from_filesystem(
+        app.config["TRACKS_CATALOG"],
+        app.config["TOP_TRACKS_CATALOG"],
+        app.config["TRACKS_WITH_DIVERSE_RECS_CATALOG"]
+    )
+    catalog.upload_tracks_to_cache(tracks_with_recs_redis.connection, tracks_with_diverse_recs_redis.connection)
+    catalog.upload_artists_to_cache(artists_redis.connection)
+    catalog.upload_recommendations_to_cache(recommendations_redis.connection, "RECOMMENDATIONS_FILE_PATH")
+    catalog.upload_recommendations_to_cache(recommendations_svd_redis.connection, "RECOMMENDATIONS_SVD_FILE_PATH")
+
+    api = Api(app)
+    api.add_resource(Hello, "/")
+    api.add_resource(Track, "/track/<int:track>", resource_class_args=(tracks_with_recs_redis,))
+    api.add_resource(NextTrack, "/next/<int:user>", resource_class_args=(parser, tracks_with_recs_redis, data_logger))
+    api.add_resource(LastTrack, "/last/<int:user>", resource_class_args=(parser, data_logger))
+
     app.run(host="0.0.0.0", port=7777)
