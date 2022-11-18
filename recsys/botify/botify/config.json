@@ -1,7 +1,7 @@
 {
-  "REDIS_TRACKS_HOST": "redis",
-  "REDIS_TRACKS_PORT": 6379,
-  "REDIS_TRACKS_DB": 0,
+  "REDIS_TRACKS_WITH_RECS_HOST": "redis",
+  "REDIS_TRACKS_WITH_RECS_PORT": 6379,
+  "REDIS_TRACKS_WITH_RECS_DB": 0,
   "REDIS_ARTIST_HOST": "redis",
   "REDIS_ARTIST_PORT": 6379,
   "REDIS_ARTIST_DB": 1,
@@ -14,12 +14,13 @@
   "REDIS_TRACKS_WITH_DIVERSE_RECS_HOST": "redis",
   "REDIS_TRACKS_WITH_DIVERSE_RECS_PORT": 6379,
   "REDIS_TRACKS_WITH_DIVERSE_RECS_DB": 4,
-  "TRACKS_CATALOG": "./data/tracks_with_recs.json",
+
+  "TRACKS_CATALOG": "./data/recommendations_contextual.json",
   "TOP_TRACKS_CATALOG": "./data/top_tracks.json",
-  "TRACKS_WITH_DIVERSE_RECS_CATALOG": "./data/recommendations_20_5.json",
-  "RECOMMENDATIONS_FILE_PATH": "./data/recommendations.json",
+  "TRACKS_WITH_DIVERSE_RECS_CATALOG": "./data/recommendations_lightfm_20_5.json",
+  "RECOMMENDATIONS_FILE_PATH": "./data/recommendations_collaborative_user_based.json",
   "RECOMMENDATIONS_SVD_FILE_PATH": "./data/recommendations_SVD.json",
   "DATA_LOG_FILE": "./log/data.json",
-  "DATA_LOG_FILE_MAX_BYTES": 104857600,
+  "DATA_LOG_FILE_MAX_BYTES": 500000000,
   "DATA_LOG_FILE_BACKUP_COPIES": 10
 }
