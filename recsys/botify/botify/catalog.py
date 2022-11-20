@@ -21,8 +21,10 @@ class Catalog:
         self.tracks_with_recs = []
         self.tracks_with_diverse_recs = []
         self.top_track_ids = []
+        self.tracks_with_recs_contextual_v2 = []
 
-    def load_data_from_filesystem(self, tracks_with_recs_path: str, top_tracks_path: str, tracks_with_diverse_recs_path: str):
+    def load_data_from_filesystem(self, tracks_with_recs_path: str, top_tracks_path: str,
+                                  tracks_with_diverse_recs_path: str, tracks_with_recs_contextual_v2_path: str):
         self.app.logger.info(f"Loading tracks from {tracks_with_recs_path}")
         self.tracks_with_recs = self.load_track_data_from_file(tracks_with_recs_path)
         self.app.logger.info(f"Loaded {len(self.tracks_with_recs)} tracks")
@@ -36,6 +38,10 @@ class Catalog:
             self.top_track_ids = json.load(top_tracks_file)
         self.app.logger.info(f"Loaded {len(self.top_track_ids)} top tracks")
 
+        self.app.logger.info(f"Loading tracks from {tracks_with_recs_contextual_v2_path}")
+        self.tracks_with_recs_contextual_v2 = self.load_track_data_from_file(tracks_with_recs_contextual_v2_path)
+        self.app.logger.info(f"Loaded {len(self.tracks_with_recs_contextual_v2)} tracks")
+
         return self
 
     @staticmethod
@@ -48,7 +54,9 @@ class Catalog:
 
         return tracks
 
-    def upload_tracks_to_cache(self, redis_tracks_with_recs: Union[Redis, StrictRedis], redis_tracks_with_diverse_recs: Union[Redis, StrictRedis]):
+    def upload_tracks_to_cache(self, redis_tracks_with_recs: Union[Redis, StrictRedis],
+                               redis_tracks_with_diverse_recs: Union[Redis, StrictRedis],
+                               redis_tracks_with_recs_contextual_v2: Union[Redis, StrictRedis]):
         self.app.logger.info(f"Uploading tracks to redis")
 
         for track in self.tracks_with_recs:
@@ -57,8 +65,13 @@ class Catalog:
         for track in self.tracks_with_diverse_recs:
             redis_tracks_with_diverse_recs.set(track.track, to_bytes(track))
 
+        for track in self.tracks_with_recs_contextual_v2:
+            redis_tracks_with_recs_contextual_v2.set(track.track, to_bytes(track))
+
         self.app.logger.info(
-            f"Uploaded {len(self.tracks_with_recs)} tracks with recs, {len(self.tracks_with_diverse_recs)} tracks with diverse recs"
+            f"Uploaded {len(self.tracks_with_recs)} tracks with recs, "
+            f"{len(self.tracks_with_diverse_recs)} tracks with diverse recs, "
+            f"{len(self.tracks_with_recs)} tracks with diverse contextual recs"
         )
 
     def upload_artists_to_cache(self, redis: Union[Redis, StrictRedis]):

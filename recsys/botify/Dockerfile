@@ -8,6 +8,7 @@ RUN pip install -r requirements.txt
 
 COPY botify ./botify
 COPY data ./data
+COPY checkpoints ./checkpoints
 
 RUN mkdir -p ./log
 

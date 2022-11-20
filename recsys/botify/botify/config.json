@@ -14,13 +14,22 @@
   "REDIS_TRACKS_WITH_DIVERSE_RECS_HOST": "redis",
   "REDIS_TRACKS_WITH_DIVERSE_RECS_PORT": 6379,
   "REDIS_TRACKS_WITH_DIVERSE_RECS_DB": 4,
+  "REDIS_TRACKS_WITH_RECS_CONTEXTUAL_V2_HOST": "redis",
+  "REDIS_TRACKS_WITH_RECS_CONTEXTUAL_V2_PORT": 6379,
+  "REDIS_TRACKS_WITH_RECS_CONTEXTUAL_V2_DB": 5,
+  "REDIS_SESSION_HOST": "redis",
+  "REDIS_SESSION_PORT": 6379,
+  "REDIS_SESSION_DB": 6,
 
   "TRACKS_CATALOG": "./data/recommendations_contextual.json",
   "TOP_TRACKS_CATALOG": "./data/top_tracks.json",
   "TRACKS_WITH_DIVERSE_RECS_CATALOG": "./data/recommendations_lightfm_20_5.json",
   "RECOMMENDATIONS_FILE_PATH": "./data/recommendations_collaborative_user_based.json",
   "RECOMMENDATIONS_SVD_FILE_PATH": "./data/recommendations_SVD.json",
+  "RECOMMENDATIONS_CONTEXTUAL_V2_FILE_PATH": "./data/recommendations_contextual_v2_40.json",
   "DATA_LOG_FILE": "./log/data.json",
   "DATA_LOG_FILE_MAX_BYTES": 500000000,
-  "DATA_LOG_FILE_BACKUP_COPIES": 10
+  "DATA_LOG_FILE_BACKUP_COPIES": 10,
+  "CHECKPOINT_PATH": "./checkpoints/epoch=47-step=16944.ckpt",
+  "TRACK_EMBEDDINGS_PATH": "./checkpoints/track_embeddings.pt"
 }
